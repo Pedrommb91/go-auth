@@ -1,0 +1,104 @@
+openapi: '3.0.0'
+info:
+  title: Go Template API
+  version: '1.0.0'
+servers:
+  - url: https://localhost:8080/api/v1
+paths:
+  /greeting/{name}:
+    get:
+      operationId: getHelloWorldHandler
+      tags:
+        - Greetings
+      description: Gets a greeting with the given name
+      parameters:
+        - name: name
+          in: path
+          description: Person's name to be greeted
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Greeting
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Greeting'
+        "500":
+          description: Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Error'
+  /users:
+    get:
+      operationId: getUsersHandler 
+      tags:
+        - Users
+      description: Gets a list of users
+      responses:
+        "200":
+          description: Users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetUsersResponse'
+        "500":
+          description: Error response
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Greeting:
+      required:
+        - message
+      type: object
+      properties:
+        message:
+          type: string
+    GetUsersResponse:
+      required:
+        - id
+        - name
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+    Error:
+      required:
+        - id
+        - timestamp
+        - status
+        - error
+        - message
+        - path
+      type: object
+      properties:
+        id:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          format: int32
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string

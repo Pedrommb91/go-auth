@@ -1,0 +1,20 @@
+app:
+  name: 'go-template'
+  version: '1.0.0'
+
+logger:
+  log_level: 'debug'
+
+api:
+  cors_allow_origins: ''
+  address: ':8080'
+
+database:
+  host:
+  port:
+  user:
+  dbname:
+  password:
+  sslmode:
+  schema:
+
