@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/Pedrommb91/go-api-template/config"
-	"github.com/Pedrommb91/go-api-template/internal/app"
+	"github.com/Pedrommb91/go-auth/config"
+	"github.com/Pedrommb91/go-auth/internal/app"
 )
 
 func main() {

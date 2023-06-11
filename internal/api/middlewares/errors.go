@@ -1,10 +1,10 @@
 package middlewares
 
 import (
-	"github.com/Pedrommb91/go-api-template/internal/api/openapi"
-	"github.com/Pedrommb91/go-api-template/pkg/clock"
-	"github.com/Pedrommb91/go-api-template/pkg/errors"
-	"github.com/Pedrommb91/go-api-template/pkg/logger"
+	"github.com/Pedrommb91/go-auth/internal/api/openapi"
+	"github.com/Pedrommb91/go-auth/pkg/clock"
+	"github.com/Pedrommb91/go-auth/pkg/errors"
+	"github.com/Pedrommb91/go-auth/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
 

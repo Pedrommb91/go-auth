@@ -1,4 +1,4 @@
-# go-api-template
+# go-auth
 The main target for this project is to provide a go lang starting template with the most used features that we will need to have for a project development.
 
 - [go-template](#go-template)

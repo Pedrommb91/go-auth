@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/Pedrommb91/go-api-template/config"
+	"github.com/Pedrommb91/go-auth/config"
 
 	_ "github.com/lib/pq"
 )

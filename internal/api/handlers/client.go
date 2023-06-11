@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"github.com/Pedrommb91/go-api-template/config"
-	"github.com/Pedrommb91/go-api-template/internal/api/openapi"
-	"github.com/Pedrommb91/go-api-template/internal/api/repositories"
-	"github.com/Pedrommb91/go-api-template/pkg/logger"
+	"github.com/Pedrommb91/go-auth/config"
+	"github.com/Pedrommb91/go-auth/internal/api/openapi"
+	"github.com/Pedrommb91/go-auth/internal/api/repositories"
+	"github.com/Pedrommb91/go-auth/pkg/logger"
 )
 
 type client struct {

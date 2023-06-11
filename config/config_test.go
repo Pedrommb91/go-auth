@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/Pedrommb91/go-api-template/config"
+	"github.com/Pedrommb91/go-auth/config"
 	"github.com/stretchr/testify/assert"
 )
 

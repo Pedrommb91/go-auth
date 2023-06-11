@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/Pedrommb91/go-api-template/pkg/logger"
+	"github.com/Pedrommb91/go-auth/pkg/logger"
 	"github.com/rs/zerolog"
 	uuid "github.com/satori/go.uuid"
 )

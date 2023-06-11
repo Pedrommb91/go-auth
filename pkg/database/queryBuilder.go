@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/Pedrommb91/go-api-template/pkg/errors"
+	"github.com/Pedrommb91/go-auth/pkg/errors"
 	"github.com/rs/zerolog"
 )
 

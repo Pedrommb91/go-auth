@@ -1,11 +1,11 @@
 package app
 
 import (
-	"github.com/Pedrommb91/go-api-template/config"
-	"github.com/Pedrommb91/go-api-template/internal/api"
-	"github.com/Pedrommb91/go-api-template/internal/api/repositories"
-	"github.com/Pedrommb91/go-api-template/pkg/database"
-	"github.com/Pedrommb91/go-api-template/pkg/logger"
+	"github.com/Pedrommb91/go-auth/config"
+	"github.com/Pedrommb91/go-auth/internal/api"
+	"github.com/Pedrommb91/go-auth/internal/api/repositories"
+	"github.com/Pedrommb91/go-auth/pkg/database"
+	"github.com/Pedrommb91/go-auth/pkg/logger"
 )
 
 func Run(cfg *config.Config) {

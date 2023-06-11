@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Pedrommb91/go-api-template/internal/api/openapi"
-	"github.com/Pedrommb91/go-api-template/pkg/errors"
+	"github.com/Pedrommb91/go-auth/internal/api/openapi"
+	"github.com/Pedrommb91/go-auth/pkg/errors"
 	"github.com/gin-gonic/gin"
 )
 
