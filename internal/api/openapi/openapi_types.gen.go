@@ -7,6 +7,11 @@ import (
 	"time"
 )
 
+// CreateUserResponse defines model for CreateUserResponse.
+type CreateUserResponse struct {
+	Id int64 `json:"id"`
+}
+
 // Error defines model for Error.
 type Error struct {
 	Error     string    `json:"error"`
@@ -17,13 +22,12 @@ type Error struct {
 	Timestamp time.Time `json:"timestamp"`
 }
 
-// GetUsersResponse defines model for GetUsersResponse.
-type GetUsersResponse struct {
-	Id   string `json:"id"`
-	Name string `json:"name"`
+// RegisterUserRequestBody defines model for RegisterUserRequestBody.
+type RegisterUserRequestBody struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Username string `json:"username"`
 }
 
-// Greeting defines model for Greeting.
-type Greeting struct {
-	Message string `json:"message"`
-}
+// RegisterUserHandlerJSONRequestBody defines body for RegisterUserHandler for application/json ContentType.
+type RegisterUserHandlerJSONRequestBody = RegisterUserRequestBody

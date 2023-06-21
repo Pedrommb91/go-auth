@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/Pedrommb91/go-auth/config"
-	"github.com/Pedrommb91/go-auth/internal/api/repositories"
+	"github.com/Pedrommb91/go-auth/internal/api/handlers"
 	"github.com/Pedrommb91/go-auth/internal/router"
 	"github.com/Pedrommb91/go-auth/pkg/logger"
 	"github.com/gin-contrib/cors"
@@ -25,10 +25,9 @@ type Server struct {
 	log    *logger.Logger
 	engine *gin.Engine
 	server *http.Server
-	db     *repositories.PostgresDB
 }
 
-func NewServer(c *config.Config, l *logger.Logger, db *repositories.PostgresDB) *Server {
+func NewServer(c *config.Config, l *logger.Logger) *Server {
 	handler := gin.New()
 	return &Server{
 		cfg:    c,
@@ -39,7 +38,6 @@ func NewServer(c *config.Config, l *logger.Logger, db *repositories.PostgresDB) 
 			Handler:           handler,
 			ReadHeaderTimeout: time.Second * 30,
 		},
-		db: db,
 	}
 }
 
@@ -57,8 +55,8 @@ func (s *Server) ServerConfigure() {
 	})
 }
 
-func (s *Server) SetRoutes() {
-	router.NewRouter(s.engine, s.log, s.cfg, s.db)
+func (s *Server) SetRoutes(services *handlers.Services) {
+	router.NewRouter(s.engine, s.log, s.cfg, services)
 }
 
 func (s *Server) Run() {

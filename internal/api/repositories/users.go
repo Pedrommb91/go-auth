@@ -3,32 +3,32 @@ package repositories
 import (
 	"database/sql"
 
-	"github.com/Pedrommb91/go-auth/internal/api/openapi"
+	"github.com/Pedrommb91/go-auth/internal/api/models"
 	"github.com/Pedrommb91/go-auth/pkg/database"
 	"github.com/Pedrommb91/go-auth/pkg/errors"
-	"github.com/rs/zerolog"
 )
 
-type PostgresDB struct {
-	DB *sql.DB
+type UserRepository struct {
+	db *sql.DB
 }
 
-type UsersRepository interface {
-	GetUsers() ([]*openapi.GetUsersResponse, error)
+func NewUserRepository(db *sql.DB) *UserRepository {
+	return &UserRepository{
+		db: db,
+	}
 }
 
-func (p *PostgresDB) GetUsers() ([]*openapi.GetUsersResponse, error) {
-	const op errors.Op = "database.GetUsers"
+func (r UserRepository) AddUser(user models.Users) (int64, error) {
+	const op errors.Op = "repositories.AddUser"
 
-	users, err := database.Where[*openapi.GetUsersResponse](p.DB).Select("*").From("public.users").WithMapper(NewGetUsersMapper()).Run()
+	id, err := database.With[models.Users](r.db).Create(user)
 	if err != nil {
-		return nil, errors.Build(
+		return 0, errors.Build(
 			errors.WithOp(op),
-			errors.WithMessage("Failed to get users from database"),
 			errors.WithError(err),
-			errors.WithSeverity(zerolog.ErrorLevel),
+			errors.WithMessage("Failed to register user"),
 		)
 	}
 
-	return users, nil
+	return id, nil
 }

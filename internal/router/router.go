@@ -5,14 +5,13 @@ import (
 	"github.com/Pedrommb91/go-auth/internal/api/handlers"
 	"github.com/Pedrommb91/go-auth/internal/api/middlewares"
 	"github.com/Pedrommb91/go-auth/internal/api/openapi"
-	"github.com/Pedrommb91/go-auth/internal/api/repositories"
 	"github.com/Pedrommb91/go-auth/pkg/clock"
 	"github.com/Pedrommb91/go-auth/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/go-openapi/runtime/middleware"
 )
 
-func NewRouter(engine *gin.Engine, l logger.Interface, cfg *config.Config, db *repositories.PostgresDB) {
+func NewRouter(engine *gin.Engine, l logger.Interface, cfg *config.Config, services *handlers.Services) {
 	engine.Use(gin.Logger())
 	engine.Use(gin.Recovery())
 
@@ -32,5 +31,5 @@ func NewRouter(engine *gin.Engine, l logger.Interface, cfg *config.Config, db *r
 		BaseURL:     "/api/v1/",
 		Middlewares: mid,
 	}
-	openapi.RegisterHandlersWithOptions(engine, handlers.NewClient(cfg, l, db), opt)
+	openapi.RegisterHandlersWithOptions(engine, handlers.NewClient(cfg, l, services), opt)
 }

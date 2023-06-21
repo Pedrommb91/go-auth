@@ -4,6 +4,7 @@
 package openapi
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -11,8 +12,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-
-	"github.com/deepmap/oapi-codegen/pkg/runtime"
 )
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
@@ -88,15 +87,14 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
-	// GetHelloWorldHandler request
-	GetHelloWorldHandler(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// RegisterUserHandler request with any body
+	RegisterUserHandlerWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// GetUsersHandler request
-	GetUsersHandler(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+	RegisterUserHandler(ctx context.Context, body RegisterUserHandlerJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client) GetHelloWorldHandler(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetHelloWorldHandlerRequest(c.Server, name)
+func (c *Client) RegisterUserHandlerWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRegisterUserHandlerRequestWithBody(c.Server, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -107,8 +105,8 @@ func (c *Client) GetHelloWorldHandler(ctx context.Context, name string, reqEdito
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetUsersHandler(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetUsersHandlerRequest(c.Server)
+func (c *Client) RegisterUserHandler(ctx context.Context, body RegisterUserHandlerJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRegisterUserHandlerRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -119,42 +117,19 @@ func (c *Client) GetUsersHandler(ctx context.Context, reqEditors ...RequestEdito
 	return c.Client.Do(req)
 }
 
-// NewGetHelloWorldHandlerRequest generates requests for GetHelloWorldHandler
-func NewGetHelloWorldHandlerRequest(server string, name string) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+// NewRegisterUserHandlerRequest calls the generic RegisterUserHandler builder with application/json body
+func NewRegisterUserHandlerRequest(server string, body RegisterUserHandlerJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/greeting/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
+	bodyReader = bytes.NewReader(buf)
+	return NewRegisterUserHandlerRequestWithBody(server, "application/json", bodyReader)
 }
 
-// NewGetUsersHandlerRequest generates requests for GetUsersHandler
-func NewGetUsersHandlerRequest(server string) (*http.Request, error) {
+// NewRegisterUserHandlerRequestWithBody generates requests for RegisterUserHandler with any type of body
+func NewRegisterUserHandlerRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -162,7 +137,7 @@ func NewGetUsersHandlerRequest(server string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/users")
+	operationPath := fmt.Sprintf("/register")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -172,10 +147,12 @@ func NewGetUsersHandlerRequest(server string) (*http.Request, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	req, err := http.NewRequest("POST", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -223,22 +200,22 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
-	// GetHelloWorldHandler request
-	GetHelloWorldHandlerWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*GetHelloWorldHandlerResponse, error)
+	// RegisterUserHandler request with any body
+	RegisterUserHandlerWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RegisterUserHandlerResponse, error)
 
-	// GetUsersHandler request
-	GetUsersHandlerWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetUsersHandlerResponse, error)
+	RegisterUserHandlerWithResponse(ctx context.Context, body RegisterUserHandlerJSONRequestBody, reqEditors ...RequestEditorFn) (*RegisterUserHandlerResponse, error)
 }
 
-type GetHelloWorldHandlerResponse struct {
+type RegisterUserHandlerResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *map[string]interface{}
+	JSON400      *map[string]interface{}
 	JSON500      *map[string]interface{}
 }
 
 // Status returns HTTPResponse.Status
-func (r GetHelloWorldHandlerResponse) Status() string {
+func (r RegisterUserHandlerResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -246,63 +223,39 @@ func (r GetHelloWorldHandlerResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r GetHelloWorldHandlerResponse) StatusCode() int {
+func (r RegisterUserHandlerResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type GetUsersHandlerResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *[]GetUsersResponse
-	JSON500      *map[string]interface{}
-}
-
-// Status returns HTTPResponse.Status
-func (r GetUsersHandlerResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetUsersHandlerResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-// GetHelloWorldHandlerWithResponse request returning *GetHelloWorldHandlerResponse
-func (c *ClientWithResponses) GetHelloWorldHandlerWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*GetHelloWorldHandlerResponse, error) {
-	rsp, err := c.GetHelloWorldHandler(ctx, name, reqEditors...)
+// RegisterUserHandlerWithBodyWithResponse request with arbitrary body returning *RegisterUserHandlerResponse
+func (c *ClientWithResponses) RegisterUserHandlerWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RegisterUserHandlerResponse, error) {
+	rsp, err := c.RegisterUserHandlerWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseGetHelloWorldHandlerResponse(rsp)
+	return ParseRegisterUserHandlerResponse(rsp)
 }
 
-// GetUsersHandlerWithResponse request returning *GetUsersHandlerResponse
-func (c *ClientWithResponses) GetUsersHandlerWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetUsersHandlerResponse, error) {
-	rsp, err := c.GetUsersHandler(ctx, reqEditors...)
+func (c *ClientWithResponses) RegisterUserHandlerWithResponse(ctx context.Context, body RegisterUserHandlerJSONRequestBody, reqEditors ...RequestEditorFn) (*RegisterUserHandlerResponse, error) {
+	rsp, err := c.RegisterUserHandler(ctx, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseGetUsersHandlerResponse(rsp)
+	return ParseRegisterUserHandlerResponse(rsp)
 }
 
-// ParseGetHelloWorldHandlerResponse parses an HTTP response from a GetHelloWorldHandlerWithResponse call
-func ParseGetHelloWorldHandlerResponse(rsp *http.Response) (*GetHelloWorldHandlerResponse, error) {
+// ParseRegisterUserHandlerResponse parses an HTTP response from a RegisterUserHandlerWithResponse call
+func ParseRegisterUserHandlerResponse(rsp *http.Response) (*RegisterUserHandlerResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &GetHelloWorldHandlerResponse{
+	response := &RegisterUserHandlerResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -315,38 +268,12 @@ func ParseGetHelloWorldHandlerResponse(rsp *http.Response) (*GetHelloWorldHandle
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest map[string]interface{}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON500 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetUsersHandlerResponse parses an HTTP response from a GetUsersHandlerWithResponse call
-func ParseGetUsersHandlerResponse(rsp *http.Response) (*GetUsersHandlerResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetUsersHandlerResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest []GetUsersResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
+		response.JSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest map[string]interface{}

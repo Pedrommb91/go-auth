@@ -4,21 +4,14 @@
 package openapi
 
 import (
-	"fmt"
-	"net/http"
-
-	"github.com/deepmap/oapi-codegen/pkg/runtime"
 	"github.com/gin-gonic/gin"
 )
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 
-	// (GET /greeting/{name})
-	GetHelloWorldHandler(c *gin.Context, name string)
-
-	// (GET /users)
-	GetUsersHandler(c *gin.Context)
+	// (POST /register)
+	RegisterUserHandler(c *gin.Context)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -30,35 +23,14 @@ type ServerInterfaceWrapper struct {
 
 type MiddlewareFunc func(c *gin.Context)
 
-// GetHelloWorldHandler operation middleware
-func (siw *ServerInterfaceWrapper) GetHelloWorldHandler(c *gin.Context) {
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameter("simple", false, "name", c.Param("name"), &name)
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter name: %s", err), http.StatusBadRequest)
-		return
-	}
+// RegisterUserHandler operation middleware
+func (siw *ServerInterfaceWrapper) RegisterUserHandler(c *gin.Context) {
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 	}
 
-	siw.Handler.GetHelloWorldHandler(c, name)
-}
-
-// GetUsersHandler operation middleware
-func (siw *ServerInterfaceWrapper) GetUsersHandler(c *gin.Context) {
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-	}
-
-	siw.Handler.GetUsersHandler(c)
+	siw.Handler.RegisterUserHandler(c)
 }
 
 // GinServerOptions provides options for the Gin server.
@@ -90,9 +62,7 @@ func RegisterHandlersWithOptions(router *gin.Engine, si ServerInterface, options
 		ErrorHandler:       errorHandler,
 	}
 
-	router.GET(options.BaseURL+"/greeting/:name", wrapper.GetHelloWorldHandler)
-
-	router.GET(options.BaseURL+"/users", wrapper.GetUsersHandler)
+	router.POST(options.BaseURL+"/register", wrapper.RegisterUserHandler)
 
 	return router
 }

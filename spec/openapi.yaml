@@ -5,51 +5,34 @@ info:
 servers:
   - url: https://localhost:8080/api/v1
 paths:
-  /greeting/{name}:
-    get:
-      operationId: getHelloWorldHandler
+  /register:
+    post:
+      operationId:  RegisterUserHandler
       tags:
-        - Greetings
-      description: Gets a greeting with the given name
-      parameters:
-        - name: name
-          in: path
-          description: Person's name to be greeted
-          required: true
-          schema:
-            type: string
+        - registration
+      requestBody: 
+        content: 
+          application/json:
+            schema: 
+              type: object
+              $ref: '#/components/schemas/RegisterUserRequestBody'
       responses:
         "200":
-          description: Greeting
+          description: "Register user"
           content:
             application/json:
               schema:
                 type: object
                 items:
-                  $ref: '#/components/schemas/Greeting'
-        "500":
-          description: Error response
+                  $ref: '#/components/schemas/CreateUserResponse' 
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
                 type: object
                 items:
                   $ref: '#/components/schemas/Error'
-  /users:
-    get:
-      operationId: getUsersHandler 
-      tags:
-        - Users
-      description: Gets a list of users
-      responses:
-        "200":
-          description: Users
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/GetUsersResponse'
         "500":
           description: Error response
           content:
@@ -61,23 +44,35 @@ paths:
 
 components:
   schemas:
-    Greeting:
+    RegisterUserRequestBody:
       required:
-        - message
+        - username
+        - email
+        - password
       type: object
       properties:
-        message:
+        username:
           type: string
-    GetUsersResponse:
+          minLength: 3
+          maxLength: 63
+        email:
+          type: string
+          minLength: 3
+          maxLength: 253
+          pattern: '^[A-Za-z0-9._+%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$'
+        password:
+          type: string
+          minLength: 8
+          maxLength: 63
+          pattern: '^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$' # Minimum eight characters, at least one letter and one number
+    CreateUserResponse:
       required:
         - id
-        - name
       type: object
       properties:
         id:
-          type: string
-        name:
-          type: string
+          type: integer
+          format: int64
     Error:
       required:
         - id

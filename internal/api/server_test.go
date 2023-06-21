@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/Pedrommb91/go-auth/config"
-	"github.com/Pedrommb91/go-auth/internal/api/repositories"
 	"github.com/Pedrommb91/go-auth/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
@@ -21,13 +20,9 @@ func TestServer_Run(t *testing.T) {
 		engine *gin.Engine
 		server *http.Server
 	}
-	type args struct {
-		db *repositories.PostgresDB
-	}
 	tests := []struct {
 		name   string
 		fields fields
-		args   args
 	}{
 		{
 			name: "valid args runs ok",
@@ -46,16 +41,13 @@ func TestServer_Run(t *testing.T) {
 					ReadHeaderTimeout: time.Second * 30,
 				},
 			},
-			args: args{
-				db: nil,
-			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := NewServer(tt.fields.cfg, tt.fields.log, tt.args.db)
+			s := NewServer(tt.fields.cfg, tt.fields.log)
 			s.ServerConfigure()
-			s.SetRoutes()
+			s.SetRoutes(nil)
 			go func() {
 				time.Sleep(time.Millisecond * 500)
 				p, err := os.FindProcess(os.Getpid())

@@ -13,6 +13,7 @@ type (
 		Log      `mapstructure:"logger"`
 		API      `mapstructure:"api"`
 		Database `mapstructure:"database"`
+		Encrypt  `mapstructure:"encrypt"`
 	}
 
 	App struct {
@@ -37,6 +38,10 @@ type (
 		Password string `env-required:"true" mapstructure:"password" env:"DATABASE_PASSWORD"`
 		SslMode  string `env-required:"true" mapstructure:"sslmode" env:"DATABASE_SSLMODE"`
 		Schema   string `env-required:"true" mapstructure:"schema" env:"DATABASE_SCHEMA"`
+	}
+
+	Encrypt struct {
+		Password string `env-required:"true" mapstructure:"password" env:"ENCRYPT_PASSWORD"`
 	}
 )
 

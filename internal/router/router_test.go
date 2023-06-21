@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/Pedrommb91/go-auth/config"
-	"github.com/Pedrommb91/go-auth/internal/api/repositories"
 	"github.com/Pedrommb91/go-auth/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
@@ -14,7 +13,6 @@ func TestNewRouter(t *testing.T) {
 		engine *gin.Engine
 		l      logger.Interface
 		cfg    *config.Config
-		db     *repositories.PostgresDB
 	}
 	tests := []struct {
 		name string
@@ -26,13 +24,12 @@ func TestNewRouter(t *testing.T) {
 				engine: &gin.Engine{RouterGroup: gin.New().RouterGroup},
 				l:      logger.New("info"),
 				cfg:    &config.Config{},
-				db:     nil,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			NewRouter(tt.args.engine, tt.args.l, tt.args.cfg, tt.args.db)
+			NewRouter(tt.args.engine, tt.args.l, tt.args.cfg, nil)
 			if len(tt.args.engine.Handlers) == 0 {
 				t.Errorf("Failed to register handlers")
 			}
