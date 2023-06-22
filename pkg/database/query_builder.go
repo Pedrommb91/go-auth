@@ -3,12 +3,14 @@ package database
 import (
 	"context"
 	"database/sql"
+	nerrors "errors"
 	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
 
 	"github.com/Pedrommb91/go-auth/pkg/errors"
+	"github.com/lib/pq"
 	"github.com/rs/zerolog"
 )
 
@@ -189,6 +191,19 @@ func (q *queryBuilder[T]) createWithParentRelations(tx *sql.Tx, model any, refer
 	var id int64
 	err := tx.QueryRowContext(context.TODO(), sqlStatement).Scan(&id)
 	if err != nil {
+		var pqErr *pq.Error
+		if nerrors.As(err, &pqErr) {
+			// Class 23 - Integrity Constraint Violation
+			if strings.HasPrefix(string(pqErr.Code), "23") {
+				return 0, errors.Build(
+					errors.WithOp(op),
+					errors.WithMessage(pqErr.Detail),
+					errors.WithError(err),
+					errors.WithSeverity(zerolog.WarnLevel),
+					errors.KindBadRequest(),
+				)
+			}
+		}
 		return 0, errors.Build(
 			errors.WithOp(op),
 			errors.WithMessage("Failed to insert entry"),

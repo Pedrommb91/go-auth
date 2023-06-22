@@ -22,6 +22,8 @@ func ErrorHandler(clock clock.Clock, l logger.Interface) gin.HandlerFunc {
 				l.Error("Unexpected error: %s", v.Err)
 				continue
 			}
+			er := errors.GetFirstNestedError(err)
+			err, _ = er.(*errors.Error)
 
 			ctx.JSON(err.Kind.Int(), &openapi.Error{
 				Error:     err.Kind.String(),
