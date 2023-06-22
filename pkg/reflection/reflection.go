@@ -73,7 +73,7 @@ func GetTagByTypeName(s interface{}, field, tag string) string {
 	return ""
 }
 
-func GetAllValuesAsString(s interface{}) []any {
+func GetAllValues(s interface{}) []any {
 	values := make([]any, 0)
 	val := reflect.Indirect(reflect.ValueOf(s))
 
