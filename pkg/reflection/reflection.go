@@ -40,7 +40,9 @@ func GetAllTagsWithName(s interface{}, name string) []string {
 	t := reflect.TypeOf(s)
 	for i := 0; i < t.NumField(); i++ {
 		tag := string(t.Field(i).Tag.Get(name))
-		tags = append(tags, tag)
+		if tag != "" {
+			tags = append(tags, tag)
+		}
 	}
 
 	return tags
@@ -73,7 +75,7 @@ func GetTagByTypeName(s interface{}, field, tag string) string {
 	return ""
 }
 
-func GetAllValuesAsString(s interface{}) []any {
+func GetAllValues(s interface{}) []any {
 	values := make([]any, 0)
 	val := reflect.Indirect(reflect.ValueOf(s))
 
@@ -83,6 +85,10 @@ func GetAllValuesAsString(s interface{}) []any {
 		f := valueField.Interface()
 		val := reflect.ValueOf(f)
 
+		if val.Kind() == reflect.Ptr {
+			val = val.Elem()
+		}
+
 		switch val.Kind() {
 		case reflect.String:
 			if val.Kind() == reflect.String {
@@ -90,6 +96,10 @@ func GetAllValuesAsString(s interface{}) []any {
 			}
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 			values = append(values, val.Int())
+		case reflect.Struct:
+			if val.Type().String() == "time.Time" {
+				values = append(values, val.Interface())
+			}
 		default:
 			values = append(values, "")
 		}

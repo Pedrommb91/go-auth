@@ -30,7 +30,7 @@ func With[T any](db *sql.DB) *queryBuilder[T] {
 	return b
 }
 
-func (q *queryBuilder[T]) Create(model T) (int64, error) {
+func (q *queryBuilder[T]) Insert(model T) (int64, error) {
 	const op errors.Op = "database.Create"
 
 	parser := NewModelParser[T](model)
@@ -45,7 +45,7 @@ func (q *queryBuilder[T]) Create(model T) (int64, error) {
 		}
 		defer tx.Rollback()
 
-		id, err := q.createWithRelations(tx, model)
+		id, err := q.insertWithRelations(tx, model)
 		if err != nil {
 			return 0, errors.Build(
 				errors.WithOp(op),
@@ -54,10 +54,18 @@ func (q *queryBuilder[T]) Create(model T) (int64, error) {
 			)
 		}
 
-		tx.Commit()
+		err = tx.Commit()
+		if err != nil {
+			return 0, errors.Build(
+				errors.WithOp(op),
+				errors.WithError(err),
+				errors.WithMessage("Failed to insert entry"),
+			)
+		}
+
 		return id, nil
 	} else {
-		return q.createWithoutRelations(model)
+		return q.insertWithoutRelations(model)
 	}
 }
 
@@ -84,6 +92,7 @@ func (q *queryBuilder[T]) Run() ([]T, error) {
 			errors.WithError(fmt.Errorf("query is not valid")),
 			errors.WithMessage("Query to database invalid"),
 			errors.KindBadRequest(),
+			errors.WithSeverity(zerolog.WarnLevel),
 		)
 	}
 
@@ -93,7 +102,6 @@ func (q *queryBuilder[T]) Run() ([]T, error) {
 			errors.WithOp(op),
 			errors.WithMessage("Failed to get users from database"),
 			errors.WithError(err),
-			errors.WithSeverity(zerolog.ErrorLevel),
 		)
 	}
 
@@ -115,7 +123,7 @@ func (q *queryBuilder[T]) queryIsValid() bool {
 	return q.db != nil && q.queryStr != "" && q.mapper != nil
 }
 
-func (q *queryBuilder[T]) createWithoutRelations(model any) (int64, error) {
+func (q *queryBuilder[T]) insertWithoutRelations(model any) (int64, error) {
 	const op errors.Op = "database.createWithoutRelations"
 
 	parser := NewModelParser[T](model)
@@ -133,20 +141,19 @@ func (q *queryBuilder[T]) createWithoutRelations(model any) (int64, error) {
 			errors.WithOp(op),
 			errors.WithMessage("Failed to insert entry"),
 			errors.WithError(err),
-			errors.WithSeverity(zerolog.ErrorLevel),
 		)
 	}
 
 	return id, nil
 }
 
-func (q *queryBuilder[T]) createWithRelations(tx *sql.Tx, model any) (int64, error) {
+func (q *queryBuilder[T]) insertWithRelations(tx *sql.Tx, model any) (int64, error) {
 	const op errors.Op = "database.createWithRelations"
 
 	parser := NewModelParser[T](model)
 	var references map[string]string = make(map[string]string)
 	for _, v := range parser.GetAllRelationalStructs() {
-		id, err := q.createWithRelations(tx, v)
+		id, err := q.insertWithRelations(tx, v)
 		if err != nil {
 			return 0, errors.Build(
 				errors.WithOp(op),
@@ -158,7 +165,7 @@ func (q *queryBuilder[T]) createWithRelations(tx *sql.Tx, model any) (int64, err
 		references[parser.GetTagNameByTypeName(field)] = strconv.FormatInt(id, 10)
 	}
 
-	id, err := q.createWithParentRelations(tx, model, references)
+	id, err := q.insertWithParentRelations(tx, model, references)
 	if err != nil {
 		return 0, errors.Build(
 			errors.WithOp(op),
@@ -170,7 +177,7 @@ func (q *queryBuilder[T]) createWithRelations(tx *sql.Tx, model any) (int64, err
 	return id, nil
 }
 
-func (q *queryBuilder[T]) createWithParentRelations(tx *sql.Tx, model any, references map[string]string) (int64, error) {
+func (q *queryBuilder[T]) insertWithParentRelations(tx *sql.Tx, model any, references map[string]string) (int64, error) {
 	const op errors.Op = "database.createWithParentRelations"
 
 	parser := NewModelParser[T](model)
@@ -178,6 +185,7 @@ func (q *queryBuilder[T]) createWithParentRelations(tx *sql.Tx, model any, refer
 	values := parser.GetValues()
 	for i, v := range columns {
 		if references[v] != "" {
+			values = append(values[:i+1], values[i:]...) // index < len(a)
 			values[i] = references[v]
 		}
 	}
@@ -197,7 +205,7 @@ func (q *queryBuilder[T]) createWithParentRelations(tx *sql.Tx, model any, refer
 			if strings.HasPrefix(string(pqErr.Code), "23") {
 				return 0, errors.Build(
 					errors.WithOp(op),
-					errors.WithMessage(pqErr.Detail),
+					errors.WithMessage("Constrain violation: failed to insert entry"),
 					errors.WithError(err),
 					errors.WithSeverity(zerolog.WarnLevel),
 					errors.KindBadRequest(),
@@ -208,7 +216,6 @@ func (q *queryBuilder[T]) createWithParentRelations(tx *sql.Tx, model any, refer
 			errors.WithOp(op),
 			errors.WithMessage("Failed to insert entry"),
 			errors.WithError(err),
-			errors.WithSeverity(zerolog.ErrorLevel),
 		)
 	}
 

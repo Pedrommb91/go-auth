@@ -44,7 +44,7 @@ func (p modelParser[T]) GetQueryColumns() string {
 }
 
 func (p modelParser[T]) GetValues() []string {
-	values := reflection.GetAllValuesAsString(p.t)
+	values := reflection.GetAllValues(p.t)
 	params := make([]string, 0)
 
 	for _, v := range values {
