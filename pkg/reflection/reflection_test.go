@@ -270,7 +270,6 @@ func TestGetAllValues(t *testing.T) {
 			want: []any{
 				"dummy-name",
 				int64(1),
-				"",
 			},
 		},
 	}

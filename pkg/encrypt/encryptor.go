@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/Pedrommb91/go-auth/pkg/errors"
+	"github.com/rs/zerolog"
 	"github.com/xdg-go/pbkdf2"
 )
 
@@ -32,7 +33,9 @@ func getAesGCM(salt, encPass string) (cipher.AEAD, error) {
 			errors.WithOp(operation),
 			errors.KindInternalServerError(),
 			errors.WithError(err),
+			errors.WithSeverity(zerolog.WarnLevel),
 			errors.WithMessage("Failed to encrypt/decript password"))
+
 	}
 
 	aesGCM, err := cipher.NewGCM(block)
@@ -40,6 +43,7 @@ func getAesGCM(salt, encPass string) (cipher.AEAD, error) {
 		return nil, errors.Build(
 			errors.WithOp(operation),
 			errors.KindInternalServerError(),
+			errors.WithSeverity(zerolog.WarnLevel),
 			errors.WithError(err),
 			errors.WithMessage("Failed to encrypt/decript password"))
 	}
@@ -62,6 +66,7 @@ func (pes *PasswordEncryptor) Encrypt(plaintext, salt, encPass string) (string, 
 		return "", errors.Build(
 			errors.WithOp(operation),
 			errors.KindInternalServerError(),
+			errors.WithSeverity(zerolog.WarnLevel),
 			errors.WithError(err),
 			errors.WithMessage("Failed to encrypt password"))
 	}
@@ -89,6 +94,7 @@ func (pes *PasswordEncryptor) Decrypt(ciphertext, salt, encPass string) (string,
 		return "", errors.Build(
 			errors.WithOp(operation),
 			errors.KindInternalServerError(),
+			errors.WithSeverity(zerolog.WarnLevel),
 			errors.WithError(err),
 			errors.WithMessage("Failed to decrypt password"))
 	}
@@ -98,6 +104,7 @@ func (pes *PasswordEncryptor) Decrypt(ciphertext, salt, encPass string) (string,
 		return "", errors.Build(
 			errors.WithOp(operation),
 			errors.KindInternalServerError(),
+			errors.WithSeverity(zerolog.WarnLevel),
 			errors.WithError(err),
 			errors.WithMessage("Failed to decrypt password"))
 	}
@@ -112,6 +119,7 @@ func (pes *PasswordEncryptor) Decrypt(ciphertext, salt, encPass string) (string,
 		return "", errors.Build(
 			errors.WithOp(operation),
 			errors.KindInternalServerError(),
+			errors.WithSeverity(zerolog.WarnLevel),
 			errors.WithError(err),
 			errors.WithMessage("Failed to decrypt password"))
 	}

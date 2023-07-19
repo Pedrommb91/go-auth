@@ -21,7 +21,7 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 func (r UserRepository) AddUser(user models.Users) (int64, error) {
 	const op errors.Op = "repositories.AddUser"
 
-	id, err := database.With[models.Users](r.db).Create(user)
+	id, err := database.With[models.Users](r.db).Insert(user)
 	if err != nil {
 		return 0, errors.Build(
 			errors.WithOp(op),

@@ -216,7 +216,7 @@ func newCustomErrorWithDefaults() *Error {
 		Err:      fmt.Errorf("no error"),
 		Message:  "No message",
 		Kind:     Unexpected,
-		Severity: zerolog.WarnLevel,
+		Severity: zerolog.ErrorLevel,
 		ID:       generateID(),
 	}
 }

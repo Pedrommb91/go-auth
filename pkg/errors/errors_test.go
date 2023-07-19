@@ -29,7 +29,7 @@ func TestBuild(t *testing.T) {
 			want: &Error{
 				Kind:     Unexpected,
 				Err:      fmt.Errorf("no error"),
-				Severity: zerolog.WarnLevel,
+				Severity: zerolog.ErrorLevel,
 				ID:       dummyErrID,
 				Op:       "No operation found",
 				Message:  "No message",
@@ -60,7 +60,7 @@ func TestBuild(t *testing.T) {
 				Err:      fmt.Errorf("no error"),
 				Kind:     Unexpected,
 				ID:       "dummy-id",
-				Severity: zerolog.WarnLevel,
+				Severity: zerolog.ErrorLevel,
 				Op:       "No operation found",
 				Message:  "test-message",
 			},

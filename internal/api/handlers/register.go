@@ -6,6 +6,7 @@ import (
 	"github.com/Pedrommb91/go-auth/internal/api/openapi"
 	"github.com/Pedrommb91/go-auth/pkg/errors"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog"
 )
 
 // RegisterUserHandler implements openapi.ServerInterface.
@@ -19,6 +20,7 @@ func (cli *client) RegisterUserHandler(c *gin.Context) {
 			errors.WithError(err),
 			errors.WithMessage("Invalid user"),
 			errors.KindBadRequest(),
+			errors.WithSeverity(zerolog.WarnLevel),
 		))
 		return
 	}
