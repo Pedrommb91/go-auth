@@ -2,7 +2,6 @@ package clock
 
 import "time"
 
-//go:generate mockery --name Clock
 type Clock interface {
 	Now() time.Time
 }

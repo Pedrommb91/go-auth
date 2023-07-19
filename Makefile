@@ -24,13 +24,14 @@ mod-download:
 install-dependencies: 
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.51.1
 	go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.12.4
-	go install github.com/vektra/mockery/v2@v2.20.0
+	go install github.com/vektra/mockery/v2@v2.31.0
 	go install github.com/pressly/goose/v3/cmd/goose@latest
 
 check-formatting: ## check formatting with linter
 	golangci-lint run
 
 generate: install-dependencies mod-download
+	mockery
 	go generate ./...
 
 run: generate

@@ -1,0 +1,15 @@
+quiet: False
+keeptree: False
+disable-version-string: True
+with-expecter: False
+mockname: "{{.InterfaceName}}"
+filename: "{{.MockName}}.go"
+outpkg: mocks
+dir: "mocks"
+packages:
+  github.com/Pedrommb91/go-auth/internal/api/models:
+    config:
+      all: True
+  github.com/Pedrommb91/go-auth/pkg/clock:
+    config:
+      all: True
