@@ -14,14 +14,12 @@ func TestPasswordEncryptor_Encrypt(t *testing.T) {
 	}
 	tests := []struct {
 		name           string
-		pes            *PasswordEncryptor
 		args           args
 		wantEncryptErr error
 		wantDecryptErr error
 	}{
 		{
 			name: "Success on encryting/decrypting password",
-			pes:  &PasswordEncryptor{},
 			args: args{
 				plaintext: "very-strong-password",
 				salt:      "very-strong-salt",
@@ -33,13 +31,12 @@ func TestPasswordEncryptor_Encrypt(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			pes := &PasswordEncryptor{}
-			got, err := pes.Encrypt(tt.args.plaintext, tt.args.salt, tt.args.encPass)
+			got, err := Encrypt(tt.args.plaintext, tt.args.salt, tt.args.encPass)
 			if !errors.Equal(err, tt.wantEncryptErr) {
 				t.Errorf("PasswordEncryptor.Encrypt() error = %v, wantErr %v", err, tt.wantEncryptErr)
 				return
 			}
-			pw, err := pes.Decrypt(got, tt.args.salt, tt.args.encPass)
+			pw, err := Decrypt(got, tt.args.salt, tt.args.encPass)
 			if !errors.Equal(err, tt.wantDecryptErr) {
 				t.Errorf("PasswordEncryptor.Decrypt() error = %v, wantErr %v", err, tt.wantDecryptErr)
 				return

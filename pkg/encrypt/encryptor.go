@@ -19,8 +19,6 @@ const (
 	keyLen     = 32
 )
 
-type PasswordEncryptor struct{}
-
 func getAesGCM(salt, encPass string) (cipher.AEAD, error) {
 	const operation = "encryption.getAesGCM"
 
@@ -51,7 +49,7 @@ func getAesGCM(salt, encPass string) (cipher.AEAD, error) {
 	return aesGCM, nil
 }
 
-func (pes *PasswordEncryptor) Encrypt(plaintext, salt, encPass string) (string, error) {
+func Encrypt(plaintext, salt, encPass string) (string, error) {
 	const operation = "encryption.Encrypt"
 
 	if plaintext == "" {
@@ -81,7 +79,7 @@ func (pes *PasswordEncryptor) Encrypt(plaintext, salt, encPass string) (string, 
 	return base64.StdEncoding.EncodeToString(iv) + "-" + base64.StdEncoding.EncodeToString(data), nil
 }
 
-func (pes *PasswordEncryptor) Decrypt(ciphertext, salt, encPass string) (string, error) {
+func Decrypt(ciphertext, salt, encPass string) (string, error) {
 	const operation = "encryption.Decrypt"
 
 	if ciphertext == "" {

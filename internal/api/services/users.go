@@ -27,8 +27,7 @@ func (s UserService) AddUser(username, email, password string) (int64, error) {
 	const op errors.Op = "services.AddUser"
 
 	salt := encrypt.GeneratePassword(64, true, true)
-	e := encrypt.PasswordEncryptor{}
-	passHash, err := e.Encrypt(password, salt, s.encrypt.Password)
+	passHash, err := encrypt.Encrypt(password, salt, s.encrypt.Password)
 	if err != nil {
 		return 0, errors.Build(
 			errors.WithOp(op),

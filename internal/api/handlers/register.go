@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/Pedrommb91/go-auth/internal/api/models"
 	"github.com/Pedrommb91/go-auth/internal/api/openapi"
 	"github.com/Pedrommb91/go-auth/pkg/errors"
 	"github.com/gin-gonic/gin"
@@ -13,8 +14,8 @@ import (
 func (cli *client) RegisterUserHandler(c *gin.Context) {
 	const op errors.Op = "handlers.RegisterUserHandler"
 
-	var user *openapi.RegisterUserRequestBody
-	if err := c.ShouldBind(&user); err != nil {
+	var user *models.RegisterUserRequestBody
+	if err := c.ShouldBindJSON(&user); err != nil {
 		c.Error(errors.Build(
 			errors.WithOp(op),
 			errors.WithError(err),
@@ -24,6 +25,16 @@ func (cli *client) RegisterUserHandler(c *gin.Context) {
 		))
 		return
 	}
+
+	if err := user.Validate(); err != nil {
+		c.Error(errors.Build(
+			errors.WithOp(op),
+			errors.WithError(err),
+			errors.WithMessage("Invalid fields"),
+		))
+		return
+	}
+
 	id, err := cli.services.User.AddUser(user.Username, user.Email, user.Password)
 	if err != nil {
 		c.Error(errors.Build(
