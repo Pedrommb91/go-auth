@@ -16,3 +16,6 @@ packages:
   github.com/Pedrommb91/go-auth/pkg/clock:
     config:
       all: True
+  github.com/Pedrommb91/go-auth/pkg/encrypt:
+    config:
+      all: True

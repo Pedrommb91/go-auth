@@ -9,6 +9,7 @@ import (
 	"github.com/Pedrommb91/go-auth/internal/api/repositories"
 	"github.com/Pedrommb91/go-auth/internal/api/services"
 	"github.com/Pedrommb91/go-auth/pkg/database"
+	"github.com/Pedrommb91/go-auth/pkg/encrypt"
 	"github.com/Pedrommb91/go-auth/pkg/logger"
 )
 
@@ -27,6 +28,6 @@ func Run(cfg *config.Config) {
 func createServices(db *sql.DB, cfg *config.Config) *handlers.Services {
 	ur := repositories.NewUserRepository(db)
 	return &handlers.Services{
-		User: services.NewUserService(ur, cfg.Encrypt),
+		User: services.NewUserService(ur, cfg.Encrypt, encrypt.NewPasswordEncryptor()),
 	}
 }
