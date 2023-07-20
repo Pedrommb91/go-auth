@@ -209,7 +209,7 @@ type ClientWithResponsesInterface interface {
 type RegisterUserHandlerResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *map[string]interface{}
+	JSON201      *map[string]interface{}
 	JSON400      *map[string]interface{}
 	JSON500      *map[string]interface{}
 }
@@ -261,12 +261,12 @@ func ParseRegisterUserHandlerResponse(rsp *http.Response) (*RegisterUserHandlerR
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
 		var dest map[string]interface{}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON200 = &dest
+		response.JSON201 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest map[string]interface{}

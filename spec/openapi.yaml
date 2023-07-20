@@ -17,7 +17,7 @@ paths:
               type: object
               $ref: '#/components/schemas/RegisterUserRequestBody'
       responses:
-        "200":
+        "201":
           description: "Register user"
           content:
             application/json:
@@ -63,8 +63,8 @@ components:
         password:
           type: string
           minLength: 8
-          maxLength: 63
-          pattern: '^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$' # Minimum eight characters, at least one letter and one number
+          maxLength: 16
+          pattern: '^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,16}$' # Minimum eight characters, at least one letter and one number
     CreateUserResponse:
       required:
         - id
